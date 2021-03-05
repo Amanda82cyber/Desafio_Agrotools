@@ -71,13 +71,15 @@
                 if(valor == ""){
                     alert("Preencha o campo!");
                 }else{
+                    alert("Permita o navegador acessar sua localização! Essa informação é necessária para registrar sua resposta!");
+
                     if(navigator.geolocation){
                         navigator.geolocation.getCurrentPosition((position) => {
                             cadastrar_resposta(position.coords.latitude, position.coords.longitude, i, valor);
                         });
                     }else{
                         alert("Seu navegador não suporta Geolocalização!");
-                    }
+                    } 
                 }
             }
 
