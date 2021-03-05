@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang = "pt-BR">
+    <head>
+        <meta charset = "UTF-8" />
+        <title>Desafio Agrotools</title>
+
+        <link rel = "stylesheet" href = "node_modules/bootstrap/bootstrap.css" />
+        <link rel = "stylesheet" href = "node_modules/bootstrap/style.css" />
+        <script src = "node_modules/jquery/jquery.js"></script>
+
+        <script src = "menu.js"></script>
+        <script>window.onload = function() {add_menu(); carregar_questionarios();};</script>
+    </head>
+
+    <body>
+        <script>
+            function carregar_questionarios(){
+                var dados = JSON.parse(localStorage.getItem("dados_questionario"));
+
+                if(dados == null){
+                    localStorage.setItem("dados_questionario", []);
+                    dados = [];
+                    alert("Não há nenhum questionário cadastrado ainda!");
+                }else{
+                    $("#cards").html("");
+
+                    for(i = 0; i < dados.length; i++){
+                        conteudo = `<div class = "card bg-dark text-light mt-2">
+                                        <div class = "card-body">
+                                            <h5 class = "card-title">${dados[i].titulo}</h5>
+                                            <p class = "card-text"><strong>Usuário: </strong> ${dados[i].usuario}</p>
+                                            <p class = "card-text">
+                                                <small class = "text-muted">${dados[i].data_cadastro}</small>
+
+                                                <button class = "btn btn-sm btn-outline-primary float-right" id = "responder" onclick = "gerar_campo_resposta(${i})" type = "button">Responder</button>
+                                            </p>
+
+                                            <div id = "respostas${i}"></div>
+
+                                            <div id = "campos_resposta${i}"></div>
+                                        </div>
+                                    </div>`;
+                        
+                        $("#cards").append(conteudo);
+                    }
+                }
+            }
+
+            function gerar_campo_resposta(i){
+                if($("#campos_resposta" + i).html() == ""){
+                    carregar_respostas(i);
+
+                    $("#campos_resposta" + i).html(`<div class = "input-group mt-2">
+                                                    <input type = "text" class = "form-control" id = "resposta${i}" placeholder = "Resposta" aria-describedby = "inserir" />
+                                                    <div class = "input-group-append">
+                                                        <button class = "btn btn-outline-primary" type = "button" id = "inserir" data-toggle = "tooltip" data-placement = "bottom" title = "Enviar Resposta" onclick = "pegar_geolocalizacao(${i})">
+                                                            <i class = "fa fa-paper-plane" aria-hidden = "true"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>`);
+                }else{
+                    $("#campos_resposta" + i).html("");
+                    $("#respostas" + i).html("");
+                }
+            }
+
+            function pegar_geolocalizacao(i){
+                valor = $("#resposta" + i).val();
+
+                if(valor == ""){
+                    alert("Preencha o campo!");
+                }else{
+                    if(navigator.geolocation){
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            cadastrar_resposta(position.coords.latitude, position.coords.longitude, i, valor);
+                        });
+                    }else{
+                        alert("Seu navegador não suporta Geolocalização!");
+                    }
+                }
+            }
+
+            function cadastrar_resposta(lat, long, i, valor){
+                let respostas = JSON.parse(localStorage.getItem("respostas_questionario") || "[]");
+
+                var data = new Date();
+
+                var aux_resposta = {
+                    resposta: valor,
+                    lat: lat,
+                    long: long,
+                    id_questionario: i,
+                    data_cadastro: data.getDay() + "/" + data.getMonth() + "/" + data.getFullYear()
+                }
+
+                respostas.push(aux_resposta);
+
+                console.log(aux_resposta);
+
+                localStorage.setItem("respostas_questionario", JSON.stringify(respostas));
+
+                alert("Questão respondida com sucesso!");
+
+                $("#resposta" + i).val("");
+
+                carregar_respostas(i);
+            }
+
+            function carregar_respostas(cont){
+                var respostas = JSON.parse(localStorage.getItem("respostas_questionario"));
+
+                console.log(respostas);
+
+                if(respostas == null){
+                    localStorage.setItem("respostas_questionario", []);
+                    dados = [];
+                }else{
+                    $("#respostas" + cont).html("");
+
+                    conteudo = '<ul class = "list-group"><li class = "list-group-item bg-dark">Respostas';
+
+                    for(i = 0; i < respostas.length; i++){
+                        if(respostas[i].id_questionario == cont){
+                            conteudo += `<ul class = "list-group">
+                                        <li class = "list-group-item bg-dark">
+                                            <p>${respostas[i].resposta} (${respostas[i].data_cadastro})</p>
+                                            <p>Latitude: ${respostas[i].lat}</p>
+                                            <p class = "mb-0">Longitude: ${respostas[i].long}</p>
+                                        </li>
+                                    </ul>`;
+                        }
+                    }
+
+                    conteudo += "</li></ul>";
+
+                    $("#respostas" + cont).html(conteudo);
+                }
+            }
+        </script>
+
+        <div id = "menu"></div>
+
+        <div class = "container-fluid">
+            <div class = "card-columns" id = "cards"></div>
+        </div>
+    </body>
+</html>
