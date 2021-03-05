@@ -24,7 +24,7 @@ function add_menu(){
             <div class = "collapse navbar-collapse" id = "navbarNavAltMarkup">
                 <div class = "navbar-nav">
                     <a class = "nav-item nav-link active" href = "index.html"><i class = "fas fa-pencil-alt" aria-hidden = "true"></i> Cadastrar Questionário</a>
-                    <a class = "nav-item nav-link" href = "respostas.html"><i class = "fa fa-eye" aria-hidden = "true"></i> Ver Respostas</a>
+                    <a class = "nav-item nav-link" href = "respostas.html"><i class = "fa fa-folder-open" aria-hidden = "true"></i> Responder Questionários</a>
                 </div>
             </div>
         </nav>`;

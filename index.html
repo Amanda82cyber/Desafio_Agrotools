@@ -24,14 +24,7 @@
                 if((titulo.value == "") && (usuario.value == "") && (data_cadastro.value == "")){
                     alert("Preencha todos os campos!");
                 }else{
-                    var dados = JSON.parse(localStorage.getItem("dados_questionario"));
-    
-                    // console.log(dados);
-    
-                    if(dados == null){
-                        localStorage.setItem("dados_questionario", []);
-                        dados = [];
-                    }
+                    let dados = JSON.parse(localStorage.getItem("dados_questionario") || "[]");
     
                     var aux_cadastro = {
                         titulo: titulo.value,
